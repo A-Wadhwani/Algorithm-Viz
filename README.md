@@ -9,4 +9,4 @@ Next Steps:
   - Graph Algorithms (Minimum Spanning Trees, Shortest Path)
   - Maze Algorithms
 
-<sup>Seems like every CS student has at some point done this project ¯\\_(ツ)_/¯</sup>
+<sup>Seems like every CS student has done this project at some point ¯\\_(ツ)_/¯</sup>

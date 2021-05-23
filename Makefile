@@ -3,11 +3,14 @@ CCFLAGS = -lX11 -lGL -lpthread -lpng -lstdc++fs -std=c++17
 
 all: main
 
-main.o: main.cc olcPixelGameEngine.hh
+array_view.o: array_view.cc array_view.hh
+		$(CC) -c array_view.cc $(CCFLAGS)
+
+main.o: main.cc main.hh
 		$(CC) -c main.cc $(CCFLAGS)
 
-main: main.o
-		$(CC) -o main main.o $(CCFLAGS) 
+main: array_view.o main.o
+		$(CC) -o main main.o array_view.o $(CCFLAGS) 
 
 .PHONY: commit
 commit:
