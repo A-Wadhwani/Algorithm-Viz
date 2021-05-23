@@ -4,6 +4,7 @@ using namespace AlgorithmViz;
 
 ArrayView::ArrayView()
 {
+    g_TimeSinceFrame = 0;
     sAppName = "Algorithm Visualization: Array View";
     // olc_ConfigureSystem();
 }
@@ -15,6 +16,11 @@ bool ArrayView::OnUserCreate()
 
 bool ArrayView::OnUserUpdate(float fElapsedTime)
 {
+    if (g_TimeSinceFrame < 1.00 / g_FrameRate){
+        g_TimeSinceFrame += fElapsedTime;
+        return true;
+    } 
+    g_TimeSinceFrame = 0;
     uint8_t r = rand() % 255;
     uint8_t g = rand() % 255;
     uint8_t b = rand() % 255;
