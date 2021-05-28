@@ -1,7 +1,7 @@
 CC = g++
-CCFLAGS = -lX11 -lGL -lpthread -lpng -lstdc++fs -std=c++17
+CCFLAGS = -lX11 -lGL -lpthread -lpng -lstdc++fs -std=c++17 -g
 
-all: main
+all: array_main
 
 olcPixelGameEngine.o: olcPixelGameEngine.cc olcPixelGameEngine.hh
 		$(CC) -c olcPixelGameEngine.cc $(CCFLAGS)
@@ -9,11 +9,11 @@ olcPixelGameEngine.o: olcPixelGameEngine.cc olcPixelGameEngine.hh
 array_view.o: array_view.cc array_view.hh
 		$(CC) -c array_view.cc $(CCFLAGS)
 
-main.o: main.cc main.hh
-		$(CC) -c main.cc $(CCFLAGS)
+array_main.o: array_main.cc array_main.hh
+		$(CC) -c array_main.cc $(CCFLAGS)
 
-main: array_view.o main.o olcPixelGameEngine.o 
-		$(CC) -o main olcPixelGameEngine.o main.o array_view.o  $(CCFLAGS) 
+array_main: array_view.o array_main.o olcPixelGameEngine.o 
+		$(CC) -o array_main olcPixelGameEngine.o array_main.o array_view.o  $(CCFLAGS) 
 
 .PHONY: commit
 commit:

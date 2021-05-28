@@ -2,6 +2,10 @@
 #define array_view_hh
 
 #include "olcPixelGameEngine.hh"
+#include <vector>
+#include <string>
+
+using namespace std;
 
 namespace AlgorithmViz
 {
@@ -10,9 +14,12 @@ namespace AlgorithmViz
     private:
         float g_TimeSinceFrame = 0;
         float g_FrameRate = 60;
-        
+        vector<int> array;
+        int array_size;
+
     public:
-        ArrayView();
+        ArrayView(int size);
+        void createArrayView();
 
     public:
         bool OnUserCreate() override;
