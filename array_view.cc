@@ -41,24 +41,28 @@ bool ArrayView::OnUserUpdate(float fElapsedTime)
 
 void ArrayView::createArrayView()
 {
-    float start_w = 5;
-    float end_w = ScreenWidth() - 5;
-    float box_size = (end_w - start_w) / array_size; // Width of each array box
+    double start_w = 5;
+    double end_w = ScreenWidth() - 5;
+    double box_size = (end_w - start_w) / array_size; // Width of each array box
 
-    float start_h = 5;
-    float end_h = ScreenHeight() - 5;
-    float box_increment = (end_h - start_h) / array_size; // Height of each element in the
+    double start_h = 5;
+    double end_h = ScreenHeight() - 5;
+    double height = end_h - start_h;
+    double box_increment = (end_h - start_h) / array_size; // Height of each element in the
 
     Clear(olc::Pixel(255, 165, 152));
 
-    float x = start_w;
-    float y = start_h;
+    double x = start_w;
+    double y = start_h;
     for (int element : array)
     {
-        FillRect(x, (box_increment * element), box_size, end_h - (box_increment * element), olc::Pixel(150, 157, 255));
-        DrawRect(x, (box_increment * element), box_size, end_h - (box_increment * element), olc::Pixel(22, 103, 120));
-        if (box_size > 2){
-            DrawRect(x + 1, (box_increment * element) + 1, box_size - 2, end_h - (box_increment * element) - 2, olc::Pixel(22, 103, 120));
+        FillRect(x, height - (box_increment * element), box_size, (box_increment * element), olc::Pixel(150, 157, 255));
+        DrawRect(x, height - (box_increment * element), box_size, (box_increment * element), olc::Pixel(22, 103, 120));
+
+        if (box_size > 2)
+        {
+            DrawRect(x + 1, height - (box_increment * element) + 1, box_size - 2,
+                     (box_increment * element) - 2, olc::Pixel(22, 103, 120));
             // Double thickness
         }
         x += box_size;

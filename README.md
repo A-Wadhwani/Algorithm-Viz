@@ -1,6 +1,6 @@
 # Algorithm-Viz
 
-Algorithim Visualization using [OneLoneCode Pixel Game Engine](https://github.com/OneLoneCoder/olcPixelGameEngine). 
+Algorithim Visualization using [OneLoneCoder Pixel Game Engine](https://github.com/OneLoneCoder/olcPixelGameEngine). 
 
 Currently working on visualizations for:
   - Sorting Algorithms
