@@ -7,9 +7,10 @@ using namespace AlgorithmViz;
 
 ArrayView::ArrayView(int size)
 {
+    // Array generation
     array_size = size;
     array = vector<int>();
-    for (int i = 0; i < size; i++)
+    for (int i = 0; i < array_size; i++)
     {
         array.push_back(i + 1);
     }
@@ -17,12 +18,23 @@ ArrayView::ArrayView(int size)
     unsigned seed = std::chrono::system_clock::now().time_since_epoch().count();
     shuffle(array.begin(), array.end(), default_random_engine(seed));
 
+    // View Information
     g_TimeSinceFrame = 0;
     sAppName = "Algorithm Visualization: Array View";
 }
 
 bool ArrayView::OnUserCreate()
 {
+    // Display Settings
+    start_w = 5;
+    end_w = ScreenWidth() - 5;
+    box_size = (end_w - start_w) / array_size; // Width of each array box
+
+    start_h = 5;
+    end_h = ScreenHeight() - 5;
+    height = end_h - start_h;
+    box_increment = (end_h - start_h) / array_size; // Height of each element in the
+
     createArrayView();
     return true;
 }
@@ -41,30 +53,35 @@ bool ArrayView::OnUserUpdate(float fElapsedTime)
 
 void ArrayView::createArrayView()
 {
-    double start_w = 5;
-    double end_w = ScreenWidth() - 5;
-    double box_size = (end_w - start_w) / array_size; // Width of each array box
-
-    double start_h = 5;
-    double end_h = ScreenHeight() - 5;
-    double height = end_h - start_h;
-    double box_increment = (end_h - start_h) / array_size; // Height of each element in the
 
     Clear(olc::Pixel(255, 165, 152));
 
-    double x = start_w;
-    double y = start_h;
+    int pos = 0;
     for (int element : array)
     {
-        FillRect(x, height - (box_increment * element), box_size, (box_increment * element), olc::Pixel(150, 157, 255));
-        DrawRect(x, height - (box_increment * element), box_size, (box_increment * element), olc::Pixel(22, 103, 120));
-
-        if (box_size > 2)
-        {
-            DrawRect(x + 1, height - (box_increment * element) + 1, box_size - 2,
-                     (box_increment * element) - 2, olc::Pixel(22, 103, 120));
-            // Double thickness
-        }
-        x += box_size;
+        drawElement(pos, element, olc::INNER_COL, olc::OUTER_COL);
+        pos++;
     }
+}
+
+void ArrayView::drawElement(int position, int value, olc::Pixel inner, olc::Pixel outer)
+{
+    int x = start_w + box_size * (position);
+    FillRect(x, start_h + height - (box_increment * value), box_size, (box_increment * value), inner);
+    DrawRect(x, start_h + height - (box_increment * value), box_size, (box_increment * value), outer);
+}
+
+void ArrayView::swapElements(int pos1, int pos2)
+{
+    
+}
+
+int ArrayView::compareElements(int pos1, int pos2)
+{
+    return 0;
+}
+
+int ArrayView::getElement(int position)
+{
+    return 0;
 }
