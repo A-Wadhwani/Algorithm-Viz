@@ -127,6 +127,25 @@ bool ArrayView::OnUserUpdate(float fElapsedTime)
             createArrayView();
             break;
         }
+        case PUT_START:
+        {
+            drawElement(pos1, array[pos1], olc::Pixel(215, 0, 253), olc::OUTER_COL);
+            if (!g_fastmode)
+                break;
+        }
+        case PUT_UPDATE:
+        {
+            drawElement(pos1, array[pos1], olc::Pixel(255, 165, 152), olc::Pixel(255, 165, 152));
+            array[pos1] = pos2;
+            drawElement(pos1, array[pos1], olc::Pixel(215, 0, 253), olc::OUTER_COL);
+            if (!g_fastmode)
+                break;
+        }
+        case PUT_END:
+        {
+            createArrayView();
+            break;
+        }
         default:
             break;
         }
@@ -199,6 +218,21 @@ int ArrayView::getElement(int position)
     if (!g_fastmode)
     {
         pending_operations.push_back(Commands(GET_END, position));
+    }
+    while (!pending_operations.empty())
+    {
+        this_thread::yield();
+    }
+    return array[position];
+}
+
+int ArrayView::putElement(int position, int value)
+{
+    pending_operations.push_back(Commands(PUT_START, position, value));
+    if (!g_fastmode)
+    {
+        pending_operations.push_back(Commands(PUT_UPDATE, position, value));
+        pending_operations.push_back(Commands(PUT_END, position, value));
     }
     while (!pending_operations.empty())
     {

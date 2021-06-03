@@ -22,7 +22,10 @@ namespace AlgorithmViz
         COMPARE_MARK, // Greater: 28, 176, 22 | Lesser: 176, 46, 26 | Equal: 175, 255, 96
         COMPARE_END,
         GET_START, // 31, 254, 96
-        GET_END
+        GET_END,
+        PUT_START, 
+        PUT_UPDATE, // 215, 0, 253
+        PUT_END
     };
 
     class Commands
@@ -77,6 +80,7 @@ namespace AlgorithmViz
         void swapElements(int pos1, int pos2);
         int compareElements(int pos1, int pos2);
         int getElement(int position);
+        int putElement(int position, int value);
 
         void setFrameRate(double new_framerate)
         {
@@ -88,9 +92,6 @@ namespace AlgorithmViz
         int getSize()
         {
             return array_size;
-        }
-        void setFrameMode(bool mode){
-            g_fastmode = mode;
         }
     };
 };

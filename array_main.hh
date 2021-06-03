@@ -3,9 +3,22 @@
 
 #include "array_view.hh"
 
-void sort_view(AlgorithmViz::ArrayView *view);
+
+//Sort Enum
+enum SortOptions
+{
+    INSERTION_SORT,
+    BUBBLE_SORT,
+    SELECTION_SORT,
+    MERGE_SORT,
+    QUICK_SORT,
+    SHELL_SORT,
+};
+
+void sort_view(AlgorithmViz::ArrayView *view, SortOptions sort);
 
 //Sorts
 void bubble_sort(AlgorithmViz::ArrayView *view);
+void insertion_sort(AlgorithmViz::ArrayView *view);
 
 #endif
