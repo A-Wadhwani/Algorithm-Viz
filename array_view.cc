@@ -1,7 +1,4 @@
 #include "array_view.hh"
-#include <random>
-#include <chrono>
-#include <algorithm>
 
 using namespace AlgorithmViz;
 
@@ -21,6 +18,12 @@ ArrayView::ArrayView(int size)
     // View Information
     g_TimeSinceFrame = 0;
     sAppName = "Algorithm Visualization: Array View";
+
+    // Commands display
+    pending_operations = vector<Commands>();
+
+    // Setting up mutex
+    pthread_mutex_init(&mutex, NULL);
 }
 
 bool ArrayView::OnUserCreate()
@@ -48,6 +51,88 @@ bool ArrayView::OnUserUpdate(float fElapsedTime)
     }
     g_TimeSinceFrame = 0;
 
+    pthread_mutex_lock(&mutex);
+    if (!pending_operations.empty())
+    {
+        Commands command = pending_operations[0];
+        int pos1 = command.index1;
+        int pos2 = command.index2;
+        switch (command.command)
+        {
+        case SWAP_START:
+        {
+            drawElement(pos1, array[pos1], olc::Pixel(254, 185, 96), olc::OUTER_COL);
+            drawElement(pos2, array[pos2], olc::Pixel(254, 185, 96), olc::OUTER_COL);
+            if (!g_fastmode)
+                break;
+        }
+        case SWAP_SWITCH:
+        {
+            drawElement(pos1, array[pos1], olc::Pixel(255, 165, 152), olc::Pixel(255, 165, 152));
+            drawElement(pos2, array[pos2], olc::Pixel(255, 165, 152), olc::Pixel(255, 165, 152));
+            int temp = array[pos1];
+            array[pos1] = array[pos2];
+            array[pos2] = temp;
+            drawElement(pos1, array[pos1], olc::Pixel(254, 249, 0), olc::OUTER_COL);
+            drawElement(pos2, array[pos2], olc::Pixel(254, 249, 0), olc::OUTER_COL);
+            if (!g_fastmode)
+                break;
+        }
+        case SWAP_END:
+        {
+            createArrayView();
+            break;
+        }
+        case COMPARE_START:
+        {
+            drawElement(pos1, array[pos1], olc::Pixel(31, 254, 244), olc::OUTER_COL);
+            drawElement(pos2, array[pos2], olc::Pixel(31, 254, 244), olc::OUTER_COL);
+            if (!g_fastmode)
+                break;
+        }
+        case COMPARE_MARK:
+        {
+
+            if (array[pos1] > array[pos2])
+            {
+                drawElement(pos1, array[pos1], olc::Pixel(28, 176, 22), olc::OUTER_COL);
+                drawElement(pos2, array[pos2], olc::Pixel(176, 46, 26), olc::OUTER_COL);
+            }
+            else if (array[pos1] < array[pos2])
+            {
+                drawElement(pos2, array[pos2], olc::Pixel(28, 176, 22), olc::OUTER_COL);
+                drawElement(pos1, array[pos1], olc::Pixel(176, 46, 26), olc::OUTER_COL);
+            }
+            else
+            {
+                drawElement(pos1, array[pos1], olc::Pixel(175, 255, 96), olc::OUTER_COL);
+                drawElement(pos2, array[pos2], olc::Pixel(175, 255, 96), olc::OUTER_COL);
+            }
+            if (!g_fastmode)
+                break;
+        }
+        case COMPARE_END:
+        {
+            createArrayView();
+            break;
+        }
+        case GET_START:
+        {
+            drawElement(pos1, array[pos1], olc::Pixel(175, 255, 96), olc::OUTER_COL);
+            if (!g_fastmode)
+                break;
+        }
+        case GET_END:
+        {
+            createArrayView();
+            break;
+        }
+        default:
+            break;
+        }
+        pending_operations.erase(pending_operations.begin());
+    }
+    pthread_mutex_unlock(&mutex);
     return true;
 }
 
@@ -73,15 +158,51 @@ void ArrayView::drawElement(int position, int value, olc::Pixel inner, olc::Pixe
 
 void ArrayView::swapElements(int pos1, int pos2)
 {
-    
+    pthread_mutex_lock(&mutex);
+    pending_operations.push_back(Commands(SWAP_START, pos1, pos2));
+    if (!g_fastmode)
+    {
+        pending_operations.push_back(Commands(SWAP_SWITCH, pos1, pos2));
+        pending_operations.push_back(Commands(SWAP_END, pos1, pos2));
+    }
+    pthread_mutex_unlock(&mutex);
 }
 
 int ArrayView::compareElements(int pos1, int pos2)
 {
+    pthread_mutex_lock(&mutex);
+    pending_operations.push_back(Commands(COMPARE_START, pos1, pos2));
+    if (!g_fastmode)
+    {
+        pending_operations.push_back(Commands(COMPARE_MARK, pos1, pos2));
+        pending_operations.push_back(Commands(COMPARE_END, pos1, pos2));
+    }
+    pthread_mutex_unlock(&mutex);
+    while (!pending_operations.empty())
+    {
+        this_thread::yield();
+    }
+    if (array[pos1] > array[pos2])
+    {
+        return 1;
+    }
+    else if (array[pos1] < array[pos2])
+    {
+        return -1;
+    }
     return 0;
 }
 
 int ArrayView::getElement(int position)
 {
-    return 0;
+    pending_operations.push_back(Commands(GET_START, position));
+    if (!g_fastmode)
+    {
+        pending_operations.push_back(Commands(GET_END, position));
+    }
+    while (!pending_operations.empty())
+    {
+        this_thread::yield();
+    }
+    return array[position];
 }

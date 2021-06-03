@@ -3,6 +3,9 @@
 
 #include "array_view.hh"
 
-int main();
+void sort_view(AlgorithmViz::ArrayView *view);
+
+//Sorts
+void bubble_sort(AlgorithmViz::ArrayView *view);
 
 #endif
