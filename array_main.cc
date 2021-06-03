@@ -18,6 +18,9 @@ void sort_view(ArrayView *view, SortOptions sort)
 	case INSERTION_SORT:
 		insertion_sort(view);
 		break;
+	case MERGE_SORT:
+		merge_sort(view, 0, view->getSize() - 1);
+		break;
 	}
 	auto end = std::chrono::system_clock::now();
 	std::chrono::duration<double> elapsed_seconds = end - start;
@@ -56,6 +59,62 @@ void bubble_sort(ArrayView *view)
 	}
 }
 
+void merge_sort(ArrayView *view, int l, int r)
+{
+	if (l >= r)
+	{
+		return;
+	}
+	int m = l + (r - l) / 2;
+	merge_sort(view, l, m);
+	merge_sort(view, m + 1, r);
+	merge(view, l, m, r);
+}
+
+void merge(ArrayView *view, int l, int m, int r)
+{
+	int n1 = m - l + 1;
+	int n2 = r - m;
+	int L[n1], R[n2];
+
+	for (int i = 0; i < n1; i++)
+		L[i] = view->getElement(l + i);
+	for (int j = 0; j < n2; j++)
+		R[j] = view->getElement(m + 1 + j);
+
+	int i = 0;
+	int j = 0;
+	int k = l;
+
+	while (i < n1 && j < n2)
+	{
+		if (L[i] <= R[j])
+		{
+			view->putElement(k, L[i]);
+			i++;
+		}
+		else
+		{
+			view->putElement(k, R[j]);
+			j++;
+		}
+		k++;
+	}
+
+	while (i < n1)
+	{
+		view->putElement(k, L[i]);
+		i++;
+		k++;
+	}
+
+	while (j < n2)
+	{
+		view->putElement(k, R[j]);
+		j++;
+		k++;
+	}
+}
 
 int main(int argc, char **argv)
 {
@@ -93,15 +152,20 @@ int main(int argc, char **argv)
 	}
 	ArrayView view = ArrayView(num_elements);
 
-	if (argc == 4)
+	if (argc >= 4)
 	{
 		view.setFrameRate(atoi(argv[3]));
 	}
 
-	if (view.Construct(720, 720, 4, 4, false, false))
+	if (argc == 5)
+	{
+		view.setFastMode(argv[4][0] == 'y');
+	}
+
+	if (view.Construct(1600, 900, 4, 4, false, false))
 	{
 		// Make thread to do sorting.
-		std::thread sort = std::thread(sort_view, &view,  sort_option);
+		std::thread sort = std::thread(sort_view, &view, sort_option);
 
 		view.Start(); // Program doesn't return until GUI closes.
 		sort.join();

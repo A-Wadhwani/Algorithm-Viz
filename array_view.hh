@@ -93,6 +93,9 @@ namespace AlgorithmViz
         {
             return array_size;
         }
+        void setFastMode(bool mode){
+            g_fastmode = mode;
+        }
     };
 };
 

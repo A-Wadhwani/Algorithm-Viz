@@ -214,9 +214,9 @@ int ArrayView::compareElements(int pos1, int pos2)
 
 int ArrayView::getElement(int position)
 {
-    pending_operations.push_back(Commands(GET_START, position));
     if (!g_fastmode)
     {
+        pending_operations.push_back(Commands(GET_START, position));
         pending_operations.push_back(Commands(GET_END, position));
     }
     while (!pending_operations.empty())
