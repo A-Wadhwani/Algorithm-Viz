@@ -21,6 +21,9 @@ void sort_view(ArrayView *view, SortOptions sort)
 	case MERGE_SORT:
 		merge_sort(view, 0, view->getSize() - 1);
 		break;
+	case QUICK_SORT:
+		quick_sort(view, 0, view->getSize() - 1);
+		break;
 	}
 	auto end = std::chrono::system_clock::now();
 	std::chrono::duration<double> elapsed_seconds = end - start;
@@ -116,6 +119,35 @@ void merge(ArrayView *view, int l, int m, int r)
 	}
 }
 
+void quick_sort(ArrayView *view, int l, int r)
+{
+	if (l >= r)
+	{
+		return;
+	}
+	int m = partition(view, l, r);
+	quick_sort(view, l, m - 1);
+	quick_sort(view, m + 1, r);
+}
+
+int partition(ArrayView *view, int l, int r)
+{
+	// random partition
+	int i = l + rand() % (r - l + 1);
+	view->swapElements(l, i);
+	int m = l;
+	for (int j = l + 1; j <= r; j++)
+	{
+		if (view->compareElements(j, l) == -1)
+		{
+			m++;
+			view->swapElements(m, j);
+		}
+	}
+	view->swapElements(l, m);
+	return m;
+}
+
 int main(int argc, char **argv)
 {
 	int num_elements = 20;
@@ -162,7 +194,7 @@ int main(int argc, char **argv)
 		view.setFastMode(argv[4][0] == 'y');
 	}
 
-	if (view.Construct(1600, 900, 4, 4, false, false))
+	if (view.Construct(800, 400, 4, 4, false, false))
 	{
 		// Make thread to do sorting.
 		std::thread sort = std::thread(sort_view, &view, sort_option);

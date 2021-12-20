@@ -21,8 +21,10 @@ void sort_view(AlgorithmViz::ArrayView *view, SortOptions sort);
 void bubble_sort(AlgorithmViz::ArrayView *view);
 void insertion_sort(AlgorithmViz::ArrayView *view);
 void merge_sort(AlgorithmViz::ArrayView *view, int l, int r);
+void quick_sort(AlgorithmViz::ArrayView *view, int l, int r);
 
 //Helpers
 void merge(AlgorithmViz::ArrayView *view, int l, int m, int r);
+int partition(AlgorithmViz::ArrayView *view, int l, int r);
 
 #endif

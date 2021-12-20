@@ -25,3 +25,4 @@ commit:
 .PHONY: clean
 clean:
 		rm -f main *.o
+		rm array_main
