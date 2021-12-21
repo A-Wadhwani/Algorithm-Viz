@@ -3,10 +3,12 @@
 
 #include "olcPixelGameEngine.hh"
 #include <pthread.h>
+#include <unistd.h> 
 #include <vector>
 #include <string>
 #include <random>
 #include <chrono>
+#include <thread>
 #include <algorithm>
 
 using namespace std;
@@ -15,15 +17,15 @@ namespace AlgorithmViz
 {
     enum CommandOptions
     {
-        SWAP_START, // 254, 185, 96
+        SWAP_START,  // 254, 185, 96
         SWAP_SWITCH, // 254, 249, 0
         SWAP_END,
         COMPARE_START, // 31, 254, 244
-        COMPARE_MARK, // Greater: 28, 176, 22 | Lesser: 176, 46, 26 | Equal: 175, 255, 96
+        COMPARE_MARK,  // Greater: 28, 176, 22 | Lesser: 176, 46, 26 | Equal: 175, 255, 96
         COMPARE_END,
         GET_START, // 31, 254, 96
         GET_END,
-        PUT_START, 
+        PUT_START,
         PUT_UPDATE, // 215, 0, 253
         PUT_END
     };
@@ -85,7 +87,8 @@ namespace AlgorithmViz
         void setFrameRate(double new_framerate)
         {
             g_FrameRate = new_framerate;
-            if (g_FrameRate > 40){
+            if (g_FrameRate > 40)
+            {
                 g_fastmode = true;
             }
         }
@@ -93,7 +96,8 @@ namespace AlgorithmViz
         {
             return array_size;
         }
-        void setFastMode(bool mode){
+        void setFastMode(bool mode)
+        {
             g_fastmode = mode;
         }
     };

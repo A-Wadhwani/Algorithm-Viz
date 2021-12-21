@@ -25,5 +25,4 @@ commit:
 .PHONY: clean
 clean:
 		rm -f main *.o
-		[ ! -e array_main ] || rm array_main
 		[ ! -e array_main.exe ] || rm array_main.exe

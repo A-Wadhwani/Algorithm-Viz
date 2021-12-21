@@ -1,5 +1,4 @@
 #include "array_main.hh"
-#include <thread>
 
 using namespace AlgorithmViz;
 
@@ -101,44 +100,32 @@ void heap_sort(ArrayView *view)
 
 void merge(ArrayView *view, int l, int m, int r)
 {
-	int n1 = m - l + 1;
-	int n2 = r - m;
-	int L[n1], R[n2];
-
-	for (int i = 0; i < n1; i++)
-		L[i] = view->getElement(l + i);
-	for (int j = 0; j < n2; j++)
-		R[j] = view->getElement(m + 1 + j);
-
-	int i = 0;
-	int j = 0;
+	int i = l;
+	int j = m + 1;
 	int k = l;
-
-	while (i < n1 && j < n2)
+	while (i <= m && j <= r)
 	{
-		if (L[i] <= R[j])
+		if (view->compareElements(i, j) == -1)
 		{
-			view->putElement(k, L[i]);
+			view->putElement(k, view->getElement(i));
 			i++;
 		}
 		else
 		{
-			view->putElement(k, R[j]);
+			view->putElement(k, view->getElement(j));
 			j++;
 		}
 		k++;
 	}
-
-	while (i < n1)
+	while (i <= m)
 	{
-		view->putElement(k, L[i]);
+		view->putElement(k, view->getElement(i));
 		i++;
 		k++;
 	}
-
-	while (j < n2)
+	while (j <= r)
 	{
-		view->putElement(k, R[j]);
+		view->putElement(k, view->getElement(j));
 		j++;
 		k++;
 	}
@@ -162,8 +149,6 @@ int partition(ArrayView *view, int l, int r)
 	return m;
 }
 
-
-
 void heapify(ArrayView *view, int length, int i)
 {
 	int largest = i;
@@ -184,59 +169,75 @@ void heapify(ArrayView *view, int length, int i)
 	}
 }
 
+// Add usage for this program using getopt
 int main(int argc, char **argv)
 {
+	SortOptions sort_option = QUICK_SORT;
 	int num_elements = 20;
+	int frame_rate = 10;
+	bool fast_mode = false;
 
-	SortOptions sort_option = INSERTION_SORT;
-	if (argc >= 2)
+	getopt(argc, argv, "n:s:h:f:m");
+	int opt;
+	while ((opt = getopt(argc, argv, "n:s:h:f:m")) != -1)
 	{
-		switch (argv[1][1])
+		switch (opt)
 		{
-		case 'i':
-			sort_option = INSERTION_SORT;
-			break;
-		case 'b':
-			sort_option = BUBBLE_SORT;
-			break;
 		case 's':
-			sort_option = SELECTION_SORT;
+			if (strcmp(optarg, "bubble") == 0)
+			{
+				sort_option = BUBBLE_SORT;
+			}
+			else if (strcmp(optarg, "insertion") == 0)
+			{
+				sort_option = INSERTION_SORT;
+			}
+			else if (strcmp(optarg, "merge") == 0)
+			{
+				sort_option = MERGE_SORT;
+			}
+			else if (strcmp(optarg, "quick") == 0)
+			{
+				sort_option = QUICK_SORT;
+			}
+			else if (strcmp(optarg, "heap") == 0)
+			{
+				sort_option = HEAP_SORT;
+			}
+			else
+			{
+				cout << "Unrecognized sort option.\n";
+				return 1;
+			}
+			break;
+		case 'n':
+			num_elements = atoi(optarg);
+			break;
+		case 'f':
+			frame_rate = atoi(optarg);
 			break;
 		case 'm':
-			sort_option = MERGE_SORT;
-			break;
-		case 'q':
-			sort_option = QUICK_SORT;
+			fast_mode = true;
 			break;
 		case 'h':
-			sort_option = SHELL_SORT;
-			break;
-		case 'e':
-			sort_option = HEAP_SORT;
+		default:
+			cout << "Usage: " << argv[0] << " [-s sort_type] [-n num_elements] [-f]\n";
+			cout << "  -s sort_type: The sort type to use.\n";
+			cout << "  -n num_elements: The number of elements to sort.\n";
+			cout << "  -f frame_rate: The frame rate to use.\n";
+			cout << "  -m: Use fast mode.\n";
+			return 0;
 			break;
 		}
 	}
-
-	if (argc >= 3)
-	{
-		num_elements = atoi(argv[2]);
-	}
 	ArrayView view = ArrayView(num_elements);
+	view.setFrameRate(frame_rate);
+	view.setFastMode(fast_mode);
 
-	if (argc >= 4)
-	{
-		view.setFrameRate(atoi(argv[3]));
-	}
-
-	if (argc == 5)
-	{
-		view.setFastMode(argv[4][0] == 'y');
-	}
-
-	if (view.Construct(800, 400, 4, 4, false, false))
+	if (view.Construct(1200, 800, 1, 1, false, false))
 	{
 		// Make thread to do sorting.
-		std::thread sort = std::thread(sort_view, &view, sort_option);
+		thread sort = thread(sort_view, &view, sort_option);
 
 		view.Start(); // Program doesn't return until GUI closes.
 		sort.join();

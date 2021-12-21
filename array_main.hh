@@ -3,7 +3,6 @@
 
 #include "array_view.hh"
 
-
 //Sort Enum
 enum SortOptions
 {
