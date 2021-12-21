@@ -74,6 +74,31 @@ void merge_sort(ArrayView *view, int l, int r)
 	merge(view, l, m, r);
 }
 
+void quick_sort(ArrayView *view, int l, int r)
+{
+	if (l >= r)
+	{
+		return;
+	}
+	int m = partition(view, l, r);
+	quick_sort(view, l, m - 1);
+	quick_sort(view, m + 1, r);
+}
+
+void heap_sort(ArrayView *view)
+{
+	int length = view->getSize();
+	for (int i = length / 2 - 1; i >= 0; i--)
+	{
+		heapify(view, length, i);
+	}
+	for (int i = length - 1; i >= 0; i--)
+	{
+		view->swapElements(0, i);
+		heapify(view, i, 0);
+	}
+}
+
 void merge(ArrayView *view, int l, int m, int r)
 {
 	int n1 = m - l + 1;
@@ -119,17 +144,6 @@ void merge(ArrayView *view, int l, int m, int r)
 	}
 }
 
-void quick_sort(ArrayView *view, int l, int r)
-{
-	if (l >= r)
-	{
-		return;
-	}
-	int m = partition(view, l, r);
-	quick_sort(view, l, m - 1);
-	quick_sort(view, m + 1, r);
-}
-
 int partition(ArrayView *view, int l, int r)
 {
 	// random partition
@@ -146,6 +160,28 @@ int partition(ArrayView *view, int l, int r)
 	}
 	view->swapElements(l, m);
 	return m;
+}
+
+
+
+void heapify(ArrayView *view, int length, int i)
+{
+	int largest = i;
+	int l = 2 * i + 1;
+	int r = 2 * i + 2;
+	if (l < length && view->compareElements(l, largest) == 1)
+	{
+		largest = l;
+	}
+	if (r < length && view->compareElements(r, largest) == 1)
+	{
+		largest = r;
+	}
+	if (largest != i)
+	{
+		view->swapElements(i, largest);
+		heapify(view, length, largest);
+	}
 }
 
 int main(int argc, char **argv)
@@ -174,6 +210,9 @@ int main(int argc, char **argv)
 			break;
 		case 'h':
 			sort_option = SHELL_SORT;
+			break;
+		case 'e':
+			sort_option = HEAP_SORT;
 			break;
 		}
 	}

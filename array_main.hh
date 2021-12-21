@@ -13,6 +13,7 @@ enum SortOptions
     MERGE_SORT,
     QUICK_SORT,
     SHELL_SORT,
+    HEAP_SORT
 };
 
 void sort_view(AlgorithmViz::ArrayView *view, SortOptions sort);
@@ -26,5 +27,6 @@ void quick_sort(AlgorithmViz::ArrayView *view, int l, int r);
 //Helpers
 void merge(AlgorithmViz::ArrayView *view, int l, int m, int r);
 int partition(AlgorithmViz::ArrayView *view, int l, int r);
+void heapify(AlgorithmViz::ArrayView *view, int length, int i);
 
 #endif
