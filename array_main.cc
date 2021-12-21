@@ -23,26 +23,34 @@ void sort_view(ArrayView *view, SortOptions sort)
 	case QUICK_SORT:
 		quick_sort(view, 0, view->getSize() - 1);
 		break;
+	case HEAP_SORT:
+		heap_sort(view);
+		break;
 	}
+	bool verify = view->verifyArray();
 	auto end = std::chrono::system_clock::now();
 	std::chrono::duration<double> elapsed_seconds = end - start;
-	cout << "Elapsed time: " << elapsed_seconds.count() << "s\n";
+	if (!verify)
+	{
+		cout << "Sort failed" << endl;
+	}
+	else
+	{
+		cout << "Sort completed in " << elapsed_seconds.count() << " seconds" << endl;
+	}
 }
 
 void insertion_sort(ArrayView *view)
 {
 	int length = view->getSize();
-	for (int i = 0; i < length; ++i)
+	for (int i = 1; i < length; ++i)
 	{
-		int key = view->getElement(i);
-		int j = i - 1;
-
-		while (j >= 0 && view->getElement(j) > key)
+		int j = i;
+		while (j > 0 && view->compareElements(j, j - 1) < 0)
 		{
-			view->putElement(j + 1, view->getElement(j));
+			view->swapElements(j, j - 1);
 			j--;
 		}
-		view->putElement(j + 1, key);
 	}
 }
 
@@ -102,32 +110,26 @@ void merge(ArrayView *view, int l, int m, int r)
 {
 	int i = l;
 	int j = m + 1;
-	int k = l;
 	while (i <= m && j <= r)
 	{
 		if (view->compareElements(i, j) == -1)
 		{
-			view->putElement(k, view->getElement(i));
 			i++;
 		}
 		else
 		{
-			view->putElement(k, view->getElement(j));
+			int value = view->getElement(j);
+			int index = j;
+			while (index != i)
+			{
+				view->putElement(index, view->getElement(index - 1));
+				index--;
+			}
+			view->putElement(i, value);
+			i++;
+			m++;
 			j++;
 		}
-		k++;
-	}
-	while (i <= m)
-	{
-		view->putElement(k, view->getElement(i));
-		i++;
-		k++;
-	}
-	while (j <= r)
-	{
-		view->putElement(k, view->getElement(j));
-		j++;
-		k++;
 	}
 }
 
@@ -173,11 +175,11 @@ void heapify(ArrayView *view, int length, int i)
 int main(int argc, char **argv)
 {
 	SortOptions sort_option = QUICK_SORT;
+	string sort_name = "Quick Sort";
 	int num_elements = 20;
 	int frame_rate = 10;
 	bool fast_mode = false;
 
-	getopt(argc, argv, "n:s:h:f:m");
 	int opt;
 	while ((opt = getopt(argc, argv, "n:s:h:f:m")) != -1)
 	{
@@ -187,27 +189,32 @@ int main(int argc, char **argv)
 			if (strcmp(optarg, "bubble") == 0)
 			{
 				sort_option = BUBBLE_SORT;
+				sort_name = "Bubble Sort";
 			}
 			else if (strcmp(optarg, "insertion") == 0)
 			{
 				sort_option = INSERTION_SORT;
+				sort_name = "Insertion Sort";
 			}
 			else if (strcmp(optarg, "merge") == 0)
 			{
 				sort_option = MERGE_SORT;
+				sort_name = "Merge Sort";
 			}
 			else if (strcmp(optarg, "quick") == 0)
 			{
 				sort_option = QUICK_SORT;
+				sort_name = "Quick Sort";
 			}
 			else if (strcmp(optarg, "heap") == 0)
 			{
 				sort_option = HEAP_SORT;
+				sort_name = "Heap Sort";
 			}
 			else
 			{
 				cout << "Unrecognized sort option.\n";
-				return 1;
+				return -1;
 			}
 			break;
 		case 'n':
@@ -230,11 +237,11 @@ int main(int argc, char **argv)
 			break;
 		}
 	}
-	ArrayView view = ArrayView(num_elements);
+	ArrayView view = ArrayView(num_elements, sort_name);
 	view.setFrameRate(frame_rate);
 	view.setFastMode(fast_mode);
 
-	if (view.Construct(1200, 800, 1, 1, false, false))
+	if (view.Construct(800, 400, 1, 1, false, false))
 	{
 		// Make thread to do sorting.
 		thread sort = thread(sort_view, &view, sort_option);
