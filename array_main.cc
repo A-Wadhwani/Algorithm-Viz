@@ -26,6 +26,9 @@ void sort_view(ArrayView *view, SortOptions sort)
 	case HEAP_SORT:
 		heap_sort(view);
 		break;
+	case SHELL_SORT:
+		shell_sort(view);
+		break;
 	}
 	bool verify = view->verifyArray();
 	auto end = std::chrono::system_clock::now();
@@ -103,6 +106,26 @@ void heap_sort(ArrayView *view)
 	{
 		view->swapElements(0, i);
 		heapify(view, i, 0);
+	}
+}
+
+void shell_sort(ArrayView *view)
+{
+	int length = view->getSize();
+	vector<int> intervals = vector<int>{1, 4, 10, 23, 57, 132, 301, 701, 1750};
+	for (int k = intervals.size() - 1; k >= 0; k--)
+	{
+		int interval = intervals[k];
+		for (int i = interval; i < length; i += 1)
+		{
+			int temp = view->getElement(i);
+			int j;
+			for (j = i; j >= interval && view->getElement(j - interval) > temp; j -= interval)
+			{
+				view->putElement(j, view->getElement(j - interval));
+			}
+			view->putElement(j, temp);
+		}
 	}
 }
 
@@ -210,6 +233,11 @@ int main(int argc, char **argv)
 			{
 				sort_option = HEAP_SORT;
 				sort_name = "Heap Sort";
+			}
+			else if (strcmp(optarg, "shell") == 0)
+			{
+				sort_option = SHELL_SORT;
+				sort_name = "Shell Sort";
 			}
 			else
 			{
