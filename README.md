@@ -2,10 +2,10 @@
 
 Algorithim Visualization using [OneLoneCoder Pixel Game Engine](https://github.com/OneLoneCoder/olcPixelGameEngine). 
 
-Currently working on visualizations for:
+Currently completed visualizations for:
   - Sorting Algorithms
 
-Next Steps:
+Working on: 
   - Graph Algorithms (Minimum Spanning Trees, Shortest Path)
   - Maze Algorithms
 
