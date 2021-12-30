@@ -4,17 +4,13 @@ using namespace AlgorithmViz;
 
 int main()
 {
-    Graph g(7, GRAPH_UNDIRECTED);
-    g.add_edge(0, 1, 7);
-    g.add_edge(1, 2, 8);
-    g.add_edge(0, 3, 5);
-    g.add_edge(1, 3, 9);
-    g.add_edge(1, 4, 7);
-    g.add_edge(2, 4, 5);
-    g.add_edge(3, 4, 15);
-    g.add_edge(3, 5, 6);
-    g.add_edge(4, 5, 8);
-    g.add_edge(4, 6, 9);
-    g.add_edge(5, 6, 11);
-    g.print_graph();
+    GraphView view(7, GRAPH_UNDIRECTED);
+    view.add_edge(0, 1, 1);
+    view.add_edge(0, 2, 1);
+    view.add_edge(1, 2, 1);
+	if (view.Construct(800, 600, 1, 1, false, false))
+	{
+		// Make thread to do sorting.
+		view.Start(); // Program doesn't return until GUI closes.
+	}
 }
