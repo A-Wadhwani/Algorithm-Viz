@@ -5,6 +5,7 @@ using namespace AlgorithmViz;
 GraphView::GraphView(int V)
 {
     this->num_v = V;
+    this->num_e = 0;
     this->is_directed = false;
     this->adj_list = vector<vector<Edge>>(V);
 }
@@ -12,6 +13,7 @@ GraphView::GraphView(int V)
 GraphView::GraphView(int V, bool is_directed)
 {
     this->num_v = V;
+    this->num_e = 0;
     this->is_directed = is_directed;
     this->adj_list = vector<vector<Edge>>(V);
 }
@@ -76,6 +78,8 @@ bool GraphView::OnUserCreate()
 
 bool GraphView::OnUserUpdate(float fElapsedTime)
 {
+    randomized(0.01 * (rand() % 100), 100);
+    createGraphView();
     return true;
 }
 
@@ -107,18 +111,37 @@ void GraphView::draw_edge(int u, int v, int w)
 {
     pair<double, double> u_loc = vertex_locations[u];
     pair<double, double> v_loc = vertex_locations[v];
-    DrawLine(u_loc.first, u_loc.second, v_loc.first, v_loc.second, EDGE_COL);
+    // Draw Line
+    DrawLine(u_loc.first, u_loc.second,
+             v_loc.first, v_loc.second, EDGE_COL);
+    // Angle of slope
+    double angle = atan2(v_loc.second - u_loc.second,
+                         v_loc.first - u_loc.first);
+    // Drawing Directed Arrow
     if (is_directed)
     {
-        // Angle of slope
         double triangle_side = vertex_radius / 2;
-        double angle = atan2(v_loc.second - u_loc.second, v_loc.first - u_loc.first);
         // Intersection of line and circle
-        pair<double, double> p1 = pair<double, double>(v_loc.first - vertex_radius * cos(angle), v_loc.second - vertex_radius * sin(angle));
+        pair<double, double> p1 = pair<double, double>(
+            v_loc.first - vertex_radius * cos(angle),
+            v_loc.second - vertex_radius * sin(angle));
         // To find other two points of triangle
-        pair<double, double> p3 = pair<double, double>(p1.first - triangle_side * cos(angle + M_PI / 4), p1.second - triangle_side * sin(angle + M_PI / 4));
-        pair<double, double> p4 = pair<double, double>(p1.first - triangle_side * cos(angle - M_PI / 4), p1.second - triangle_side * sin(angle - M_PI / 4));
-        FillTriangle(p1.first, p1.second, p3.first, p3.second, p4.first, p4.second, EDGE_COL);
+        pair<double, double> p3 = pair<double, double>(
+            p1.first - triangle_side * cos(angle + M_PI / 4),
+            p1.second - triangle_side * sin(angle + M_PI / 4));
+        pair<double, double> p4 = pair<double, double>(
+            p1.first - triangle_side * cos(angle - M_PI / 4),
+            p1.second - triangle_side * sin(angle - M_PI / 4));
+        FillTriangle(p1.first, p1.second, p3.first,
+                     p3.second, p4.first, p4.second, EDGE_COL);
+    }
+    if (num_e < 40)
+    {
+        // Drawing Weight
+        pair<double, double> p = pair<double, double>(
+            v_loc.first - 4 * vertex_radius * cos(angle),
+            v_loc.second - 4 * vertex_radius * sin(angle));
+        DrawString(p.first, p.second, to_string(w), NODE_BORDER, 2);
     }
 }
 
@@ -151,10 +174,12 @@ bool GraphView::_remove_edge(int u, int v)
 void GraphView::add_edge(int u, int v, int w)
 {
     adj_list[u].push_back(Edge(u, v, w));
+    num_e++;
     if (!is_directed)
     {
         adj_list[v].push_back(Edge(v, u, w));
     }
+    num_e++;
 }
 
 void GraphView::add_edge(int u, int v)
@@ -207,6 +232,26 @@ bool GraphView::remove_edge(int u, int v)
 bool GraphView::directed()
 {
     return is_directed;
+}
+
+void GraphView::randomized(double density, int max_weight)
+{
+    // Clear graph
+    num_e = 0;
+    adj_list.clear();
+    adj_list.resize(num_v);
+    srand(time(NULL));
+    // Generate random edges
+    for (int i = 0; i < num_v; i++)
+    {
+        for (int j = 0; j < num_v; j++)
+        {
+            if (i != j && rand() % 100 < density * 100)
+            {
+                add_edge(i, j, rand() % max_weight + 1);
+            }
+        }
+    }
 }
 
 void GraphView::print_graph()

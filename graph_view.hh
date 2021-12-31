@@ -110,6 +110,7 @@ namespace AlgorithmViz
     private:
         /* Graph Info */
         int num_v;
+        int num_e;
         bool is_directed;
         vector<vector<Edge>> adj_list;
 
@@ -138,6 +139,7 @@ namespace AlgorithmViz
         bool OnUserUpdate(float fElapsedTime) override;
         //bool OnUserDestroy() override;
         void createGraphView();
+        void randomized(double density, int max_weight);
         void add_edge(int u, int v, int w);
         void add_edge(int u, int v);
         bool is_edge(int u, int v);
