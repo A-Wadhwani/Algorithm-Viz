@@ -119,6 +119,7 @@ namespace AlgorithmViz
 
         /* Visualization Settings */
         vector<pair<int, int>> vertex_locations;
+        int vertex_radius;
 
         /* Command Queue */
         vector<Commands> pending_operations;

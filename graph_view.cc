@@ -43,7 +43,7 @@ GraphView::GraphView(string filename)
 
 bool GraphView::OnUserCreate()
 {
-
+    // Calculate Locations of Vertices
     double min_x = 20;
     double max_x = ScreenWidth() - min_x;
     double min_y = 20;
@@ -58,6 +58,10 @@ bool GraphView::OnUserCreate()
         double y = (min_y + y_range / 2) + radius * sin(angle);
         vertex_locations.push_back(pair<double, double>(x, y));
     }
+
+    // Calculate radius of nodes:
+    double circumference = 2 * M_PI * radius;
+    vertex_radius = min(ceil(circumference / (num_v * 3)), min_y);
 
     // Display Settings
     g_FrameRate = 10;
@@ -95,8 +99,8 @@ void GraphView::createGraphView()
 void GraphView::draw_vertex(int v)
 {
     pair<double, double> vertex = vertex_locations[v];
-    FillCircle(vertex.first, vertex.second, 10, NODE_COL);
-    DrawCircle(vertex.first, vertex.second, 10, NODE_BORDER);
+    FillCircle(vertex.first, vertex.second, vertex_radius, NODE_COL);
+    DrawCircle(vertex.first, vertex.second, vertex_radius, NODE_BORDER);
 }
 
 void GraphView::draw_edge(int u, int v, int w)
@@ -104,6 +108,18 @@ void GraphView::draw_edge(int u, int v, int w)
     pair<double, double> u_loc = vertex_locations[u];
     pair<double, double> v_loc = vertex_locations[v];
     DrawLine(u_loc.first, u_loc.second, v_loc.first, v_loc.second, EDGE_COL);
+    if (is_directed)
+    {
+        // Angle of slope
+        double triangle_side = vertex_radius / 2;
+        double angle = atan2(v_loc.second - u_loc.second, v_loc.first - u_loc.first);
+        // Intersection of line and circle
+        pair<double, double> p1 = pair<double, double>(v_loc.first - vertex_radius * cos(angle), v_loc.second - vertex_radius * sin(angle));
+        // To find other two points of triangle
+        pair<double, double> p3 = pair<double, double>(p1.first - triangle_side * cos(angle + M_PI / 4), p1.second - triangle_side * sin(angle + M_PI / 4));
+        pair<double, double> p4 = pair<double, double>(p1.first - triangle_side * cos(angle - M_PI / 4), p1.second - triangle_side * sin(angle - M_PI / 4));
+        FillTriangle(p1.first, p1.second, p3.first, p3.second, p4.first, p4.second, EDGE_COL);
+    }
 }
 
 bool GraphView::_update_edge(int u, int v, int w)
