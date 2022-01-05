@@ -47,7 +47,7 @@ bool ArrayView::OnUserUpdate(float fElapsedTime)
 {
     if (GetKey(olc::Key::Q).bReleased)
     {
-        return false; // Quit game if 'Q' is pressed
+        return false; // Quit viz if 'Q' is pressed
     }
     if (GetKey(olc::Key::RIGHT).bReleased)
     {
